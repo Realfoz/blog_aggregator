@@ -1,0 +1,19 @@
+{
+  "name": "blog_aggregator",
+  "version": "1.0.0",
+  "description": "a boot.dev project to make an RSS blog agregator using typescript and SQL",
+  "main": "index.js",
+   "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx ./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.6.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
