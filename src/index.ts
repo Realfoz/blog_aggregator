@@ -1,12 +1,17 @@
-import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand } from "./command";
+import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand, handlerRegisterUser, handlerResetUsersTable, handlerGetUsers } from "./command";
 
 
 const registry: CommandsRegistry = {}; // declaired out of main func for scope
 
-function main() {
+async function main() {
 
 registerCommand(registry, "login", handlerLogin)
+registerCommand(registry, "register", handlerRegisterUser)
+registerCommand(registry, "reset", handlerResetUsersTable)
+registerCommand(registry, "users", handlerGetUsers)
 
+
+//console.log("Main started");
 const input = process.argv.slice(2);
   if (input.length < 1) {
     console.error("not enough arguments");
@@ -15,11 +20,12 @@ const input = process.argv.slice(2);
   
   const [cmdName, ...args] = input;
 try {  
-runCommand(registry,cmdName, ...args)
+await runCommand(registry,cmdName, ...args)
 } catch (err: any) {
   console.error(err.message ?? String(err));
   process.exit(1);
 }
-
+process.exit(0)
 }
+
 main();

@@ -33,7 +33,7 @@ export function setUser(userName: string): void {
   }
 
   const cfg = readConfig(); // gets the object as a copy
-  const next: Config = { ...cfg, currentUserName: userName }; // doesnt mutate it but updates it to be passed on and written, which will do the actual state changes
+  const next: Config = { ...cfg, currentUserName: userName }; // doesnt mutate it but updates it to be passed on and written, which will do the actual changes
   writeConfig(next);
 }
 
