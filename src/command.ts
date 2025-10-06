@@ -1,5 +1,6 @@
 import { setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsersDB } from "./db/queries/users";
+import { fetchFeed } from "./rss";
 
 
 export type CommandHandler = (
@@ -53,6 +54,12 @@ export async function handlerGetUsers(cmdName: string) {
     await getUsers()
 }
 
+export async function handlerGetRSSFeed(cmdname: string, ...args: string[]) {
+  const url = args[0] ?? "https://www.wagslane.dev/index.xml";
+  const feed = await fetchFeed(url);
+  console.log(JSON.stringify(feed, null, 2));
+}
+
 export async function registerCommand(registry: CommandsRegistry, cmdName: string, handler: CommandHandler) {
     if (cmdName in registry) {
         throw new Error(
@@ -69,3 +76,4 @@ export async function runCommand(registry: CommandsRegistry, cmdName: string, ..
   }
   await handler(cmdName, ...args); 
 }
+
