@@ -3,6 +3,8 @@ import { users } from "src/db/schema";
 import { eq } from "drizzle-orm";
 import { readConfig } from "src/config";
 
+export type User = typeof users.$inferSelect; // users is the table object in schema.ts, used for easy ref of the db table
+
 export async function createUser(name: string) {
   const [result] = await db.insert(users).values({ name: name }).returning();
   return result;

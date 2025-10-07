@@ -1,4 +1,5 @@
-import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand, handlerRegisterUser, handlerResetUsersTable, handlerGetUsers, handlerGetRSSFeed } from "./command";
+import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand, handlerRegisterUser, handlerResetUsersTable, handlerGetUsers, handlerGetRSSFeed, handlerAddFeed, handlerGetFeeds } from "./command";
+import { getFeedsWithCreator } from "./db/queries/feeds";
 
 
 const registry: CommandsRegistry = {}; // declaired out of main func for scope
@@ -10,6 +11,8 @@ registerCommand(registry, "register", handlerRegisterUser)
 registerCommand(registry, "reset", handlerResetUsersTable)
 registerCommand(registry, "users", handlerGetUsers)
 registerCommand(registry, "agg", handlerGetRSSFeed)
+registerCommand(registry, "addfeed", handlerAddFeed)
+registerCommand(registry, "feeds", handlerGetFeeds)
 
 
 //console.log("Main started");

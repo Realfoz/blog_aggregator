@@ -8,6 +8,13 @@
       "when": 1759586477041,
       "tag": "0000_condemned_klaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759839287921,
+      "tag": "0001_careless_norrin_radd",
+      "breakpoints": true
     }
   ]
 }

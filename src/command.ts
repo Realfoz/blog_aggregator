@@ -1,4 +1,5 @@
-import { setUser } from "./config";
+import { readConfig, setUser } from "./config";
+import { createFeed, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
 import { createUser, getUser, getUsers, resetUsersDB } from "./db/queries/users";
 import { fetchFeed } from "./rss";
 
@@ -59,6 +60,36 @@ export async function handlerGetRSSFeed(cmdname: string, ...args: string[]) {
   const feed = await fetchFeed(url);
   console.log(JSON.stringify(feed, null, 2));
 }
+
+export async function handlerAddFeed(cmdname: string, ...args: string[]) {
+    if ( args.length < 2) {
+        throw new Error(
+            `Please include a valid feed name and url`
+        )
+    }
+    const userConfig = readConfig()
+    if (!userConfig.currentUserName) {
+        throw new Error(
+            `Please register a user or log in to register a feed`
+        )
+    }
+    const userData = await getUser(userConfig.currentUserName)
+    if (!userData) {
+    throw new Error("User not found. Please register or log in.");
+    }
+    const userUUID = userData.id
+    const feedData = await createFeed(userUUID, args[0], args[1])
+    await printFeed(userData,feedData)
+}
+
+export async function handlerGetFeeds(cmdname: string, ...args: string[]) {
+    const feedsData = await getFeedsWithCreator()
+    for (let i = 0; i < feedsData.length; i++) { //could do this as a map in refactor, need to figure out how to break the objects into users/feeds better
+        printFeed(feedsData[i].users, feedsData[i].feeds)
+    }
+   
+}
+   
 
 export async function registerCommand(registry: CommandsRegistry, cmdName: string, handler: CommandHandler) {
     if (cmdName in registry) {
