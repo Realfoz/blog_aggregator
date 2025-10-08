@@ -15,6 +15,13 @@
       "when": 1759839287921,
       "tag": "0001_careless_norrin_radd",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759943448176,
+      "tag": "0002_lowly_thunderbolt_ross",
+      "breakpoints": true
     }
   ]
 }

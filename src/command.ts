@@ -1,5 +1,6 @@
 import { readConfig, setUser } from "./config";
-import { createFeed, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
+import { createFeedFollow, getFeedFollowsForUser } from "./db/queries/feed-follows";
+import { createFeed, feedURLFinder, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
 import { createUser, getUser, getUsers, resetUsersDB } from "./db/queries/users";
 import { fetchFeed } from "./rss";
 
@@ -77,10 +78,48 @@ export async function handlerAddFeed(cmdname: string, ...args: string[]) {
     if (!userData) {
     throw new Error("User not found. Please register or log in.");
     }
-    const userUUID = userData.id
+    const userUUID = userData.id // Todo: refactor with new helper function getUserUUID
     const feedData = await createFeed(userUUID, args[0], args[1])
+    await createFeedFollow(userUUID, feedData.id)
     await printFeed(userData,feedData)
 }
+
+export async function handlerFollow(cmdname: string, ...args: string[]) {
+    if (args.length === 0 || args.length >= 2) {
+        throw new Error(
+            `Please include a valid URL to follow`
+        )
+    }
+    const userConfig = readConfig()
+    if (!userConfig.currentUserName) {
+        throw new Error(
+            `Please register a user or log in to register a feed`
+        )
+    }
+    const userData = await getUser(userConfig.currentUserName)
+    if (!userData) {
+    throw new Error("User not found. Please register or log in.");
+    }
+    const userUUID = userData.id //todo: refactor to use new finduserUUID helper
+    const feedURL = args[0]
+    const feedData = await feedURLFinder(feedURL)
+    const feedFollow = await createFeedFollow(userUUID, feedData[0].id)
+    
+    console.log(`${userConfig.currentUserName} has followed ${feedData[0].name} `)
+}
+
+export async function handlerFollowing(cmdname: string, ...args: string[]) {
+    const results = await getFeedFollowsForUser()
+    if (results.length === 0) {
+        throw new Error(
+            `No results found for user`
+        )
+    }
+    console.log(`Feeds for user: ${results[0].userName}`)
+    for (let i = 0; i < results.length; i++) {
+    console.log(results[i].feedName)
+};
+};
 
 export async function handlerGetFeeds(cmdname: string, ...args: string[]) {
     const feedsData = await getFeedsWithCreator()
@@ -90,7 +129,6 @@ export async function handlerGetFeeds(cmdname: string, ...args: string[]) {
    
 }
    
-
 export async function registerCommand(registry: CommandsRegistry, cmdName: string, handler: CommandHandler) {
     if (cmdName in registry) {
         throw new Error(

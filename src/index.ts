@@ -1,4 +1,4 @@
-import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand, handlerRegisterUser, handlerResetUsersTable, handlerGetUsers, handlerGetRSSFeed, handlerAddFeed, handlerGetFeeds } from "./command";
+import { handlerLogin, registerCommand, CommandsRegistry, CommandHandler, runCommand, handlerRegisterUser, handlerResetUsersTable, handlerGetUsers, handlerGetRSSFeed, handlerAddFeed, handlerGetFeeds, handlerFollow, handlerFollowing } from "./command";
 import { getFeedsWithCreator } from "./db/queries/feeds";
 
 
@@ -13,6 +13,8 @@ registerCommand(registry, "users", handlerGetUsers)
 registerCommand(registry, "agg", handlerGetRSSFeed)
 registerCommand(registry, "addfeed", handlerAddFeed)
 registerCommand(registry, "feeds", handlerGetFeeds)
+registerCommand(registry, "follow", handlerFollow)
+registerCommand(registry, "following", handlerFollowing)
 
 
 //console.log("Main started");
