@@ -1,7 +1,7 @@
 import { readConfig, setUser } from "./config";
-import { createFeedFollow, getFeedFollowsForUser } from "./db/queries/feed-follows";
+import { createFeedFollow, getFeedFollowsForUser, unfollowFeed } from "./db/queries/feed-follows";
 import { createFeed, feedURLFinder, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
-import { createUser, getUser, getUsers, resetUsersDB } from "./db/queries/users";
+import { createUser, getUser, getUsers, resetUsersDB, User } from "./db/queries/users";
 import { fetchFeed } from "./rss";
 
 
@@ -38,13 +38,13 @@ export async function handlerRegisterUser(cmdName: string, ...args: string[]) {
     }
     const username = args[0]
     const userTest = await getUser(username)
-    if (userTest) { //undefined is falsy, if the user isnt found it will be undefined
+    if (userTest) { //undefined is falsy, if the user isnt found it will be undefined, this is intentional to weed out failers
         throw new Error(
             `Username taken, Please try again`
         )
     }   
-    await createUser(username)
-    setUser(username)
+    await createUser(username) // calls a query
+    await setUser(username) // calls a query
     console.log(`User: ${username} has been added and logged in`)
 }
 
@@ -62,7 +62,7 @@ export async function handlerGetRSSFeed(cmdname: string, ...args: string[]) {
   console.log(JSON.stringify(feed, null, 2));
 }
 
-export async function handlerAddFeed(cmdname: string, ...args: string[]) {
+export async function handlerAddFeed(cmdname: string, user: User, ...args: string[]) {
     if ( args.length < 2) {
         throw new Error(
             `Please include a valid feed name and url`
@@ -84,42 +84,41 @@ export async function handlerAddFeed(cmdname: string, ...args: string[]) {
     await printFeed(userData,feedData)
 }
 
-export async function handlerFollow(cmdname: string, ...args: string[]) {
+export async function handlerFollow(cmdname: string, user: User, ...args: string[]) {
     if (args.length === 0 || args.length >= 2) {
         throw new Error(
             `Please include a valid URL to follow`
-        )
-    }
-    const userConfig = readConfig()
-    if (!userConfig.currentUserName) {
-        throw new Error(
-            `Please register a user or log in to register a feed`
-        )
-    }
-    const userData = await getUser(userConfig.currentUserName)
-    if (!userData) {
-    throw new Error("User not found. Please register or log in.");
-    }
-    const userUUID = userData.id //todo: refactor to use new finduserUUID helper
+        )}
+
     const feedURL = args[0]
     const feedData = await feedURLFinder(feedURL)
-    const feedFollow = await createFeedFollow(userUUID, feedData[0].id)
-    
-    console.log(`${userConfig.currentUserName} has followed ${feedData[0].name} `)
+    if (!feedData) {
+        throw new Error("Feed not found. Add it first with 'addfeed'")
+        }
+    const feedFollow = await createFeedFollow(user.id, feedData[0].id)
+    console.log(`${user.name} has followed ${feedData[0].name} `)
 }
 
-export async function handlerFollowing(cmdname: string, ...args: string[]) {
-    const results = await getFeedFollowsForUser()
+export async function handlerFollowing(cmdname: string, user: User, ...args: string[]) {
+    const results = await getFeedFollowsForUser(user.id)
     if (results.length === 0) {
-        throw new Error(
-            `No results found for user`
-        )
-    }
+    console.log(`No feed follows found for this user.`)
+    return  // Exit gracefully, not with an error
+}
     console.log(`Feeds for user: ${results[0].userName}`)
     for (let i = 0; i < results.length; i++) {
     console.log(results[i].feedName)
+}
 };
-};
+
+export async function handlerUnfollow(cmdname: string, user: User, ...args: string[]) {
+    if (args.length === 0) {
+        throw new Error(
+            `Please include a valid URL to unfollow`
+        )
+    }
+   await unfollowFeed(user,args[0])
+}
 
 export async function handlerGetFeeds(cmdname: string, ...args: string[]) {
     const feedsData = await getFeedsWithCreator()

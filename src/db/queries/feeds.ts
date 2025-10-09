@@ -1,6 +1,6 @@
 import { db } from "src/db/index";
 import { feeds, users } from "src/db/schema";
-import { getUser, getUserUUID, User } from "./users";
+import { getUser, User } from "./users";
 import { eq } from "drizzle-orm";
 import { readConfig } from "src/config";
 

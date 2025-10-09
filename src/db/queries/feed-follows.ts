@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { feed_follows, feeds, users } from "../schema";
-import { getUserUUID } from "./users";
 import { db } from "..";
+import { getUserUUID } from "../middleware";
+import { User } from "./users";
 
 
 export async function createFeedFollow(user_id: string, feed_id: string) {
@@ -23,8 +24,7 @@ export async function createFeedFollow(user_id: string, feed_id: string) {
     return result;
 }
 
-export async function getFeedFollowsForUser() {
-        const userUUID = await getUserUUID()        
+export async function getFeedFollowsForUser(userUUID: string) {
         const results = await db.select({
         id: feed_follows.id,
         createdAt: feed_follows.createdAt,
@@ -40,3 +40,12 @@ export async function getFeedFollowsForUser() {
         .where(eq(feed_follows.user_id, userUUID))
         return results;
 };
+
+export async function unfollowFeed(user: User, feedURL: string) {
+   const feedID = await db.select({id: feeds.id}).from(feeds).where(eq(feeds.url, feedURL)) // feedID is an array dummy
+    if (feedID.length === 0) {
+        throw new Error(
+            "Feed not found, please try the 'following' command to see your feed URLs "
+        )}
+        await db.delete(feed_follows).where(and(eq(feed_follows.user_id, user.id), eq(feed_follows.feed_id, feedID[0].id)))
+}

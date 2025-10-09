@@ -10,8 +10,8 @@ export async function createUser(name: string) {
   return result;
 }
 
-export async function getUser(username: string) {
-    const [result] = await 
+export async function getUser(username: string) { 
+    const [result] = await                        
     db.select()
         .from(users)
         .where(eq(users.name, username));
@@ -43,18 +43,4 @@ for (let i = 0; i < result.length; i++) {
 console.log(result[i].name)
 }
 }
-}
-export async function getUserUUID(){
-    const userConfig = readConfig()
-        if (!userConfig.currentUserName) {
-            throw new Error(
-                `Please register a user or log in to register a feed`
-            )
-        }
-        const userData = await getUser(userConfig.currentUserName)
-        if (!userData) {
-        throw new Error("User not found. Please register or log in.");
-        }
-        const userUUID = userData.id
-        return userUUID;
 }
