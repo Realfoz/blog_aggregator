@@ -1,3 +1,4 @@
+import { parseDuration, scrapeFeeds } from "./aggregate";
 import { readConfig, setUser } from "./config";
 import { createFeedFollow, getFeedFollowsForUser, unfollowFeed } from "./db/queries/feed-follows";
 import { createFeed, feedURLFinder, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
@@ -57,10 +58,28 @@ export async function handlerGetUsers(cmdName: string) {
 }
 
 export async function handlerGetRSSFeed(cmdname: string, ...args: string[]) {
-  const url = args[0] ?? "https://www.wagslane.dev/index.xml";
-  const feed = await fetchFeed(url);
-  console.log(JSON.stringify(feed, null, 2));
-}
+    if ( args.length < 1) {
+        throw new Error(
+            `Please include a valid timer`
+        )
+    }
+    const timerArg = args[0]
+    const parsedTimer = parseDuration(timerArg)
+    const handleError = (e: unknown) => {
+        console.error("scrape error:", e);
+        };
+    await scrapeFeeds().catch(handleError) // calls it 1st to get it going
+    const interval = setInterval(() => {
+        scrapeFeeds().catch(handleError);}, parsedTimer); // calls it every X based on input
+
+    await new Promise<void>((resolve) => { // this is straight magical bullshit
+        process.on("SIGINT", () => {  // pretty sure its a way to interupt the program with the equivelent of a ctrl+c
+        console.log("Shutting down feed aggregator..."); // should only call this if the promise resolves as a void
+        clearInterval(interval); // nukes the interval to stop it from continuing to restart
+        resolve(); // resolves the bungled promise so things dont fall over and grind to a hault
+  });
+});
+};
 
 export async function handlerAddFeed(cmdname: string, user: User, ...args: string[]) {
     if ( args.length < 2) {

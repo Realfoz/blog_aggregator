@@ -52,8 +52,8 @@ export async function fetchFeed(feedURL: string) {
 })
 let xmlString = await response.text()
 const parser = new XMLParser()
-const parsedXML: ParsedRSS = parser.parse(xmlString)
-const channel = parsedXML.rss?.channel; 
+const parsedXML: any = parser.parse(xmlString) as ParsedRSS;
+const channel = parsedXML.rss?.channel as ParsedChannel | undefined; 
 
 if (!channel) throw new Error("channel field not found");
 const feedMetadata: RSSFeed = extractMetadata(channel)

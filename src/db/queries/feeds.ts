@@ -1,7 +1,7 @@
 import { db } from "src/db/index";
 import { feeds, users } from "src/db/schema";
 import { getUser, User } from "./users";
-import { eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { readConfig } from "src/config";
 
 export type Feed = typeof feeds.$inferSelect; // feeds is the table object in schema.ts
@@ -27,3 +27,32 @@ export async function feedURLFinder(url: string) {
     const result = await db.select({ id: feeds.id, name: feeds.name}).from(feeds).where(eq(feeds.url, url))
     return result;
 };
+
+export async function markFeedFetched(feedID: string) {
+
+await db.update(feeds)
+  .set({
+    lastFetchedAt: sql`now()`,
+    updatedAt: sql`now()`,
+  })
+  .where(eq(feeds.id, feedID));
+}
+
+export async function getNextFeedToFetch() {
+  const rows = await db
+    .select({
+      id: feeds.id,
+      url: feeds.url,
+      lastFetchedAt: feeds.lastFetchedAt,
+      createdAt: feeds.createdAt,
+    })
+    .from(feeds)
+    .orderBy(
+      sql`${feeds.lastFetchedAt} NULLS FIRST`, // nulls before nerds 
+      asc(feeds.createdAt),
+      asc(feeds.id),
+    )
+    .limit(1);
+
+  return rows[0] ?? null;
+}
