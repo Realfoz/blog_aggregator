@@ -2,6 +2,7 @@ import { parseDuration, scrapeFeeds } from "./aggregate";
 import { readConfig, setUser } from "./config";
 import { createFeedFollow, getFeedFollowsForUser, unfollowFeed } from "./db/queries/feed-follows";
 import { createFeed, feedURLFinder, getFeedsWithCreator, printFeed } from "./db/queries/feeds";
+import { getPostsForUser } from "./db/queries/posts";
 import { createUser, getUser, getUsers, resetUsersDB, User } from "./db/queries/users";
 import { fetchFeed } from "./rss";
 
@@ -145,6 +146,20 @@ export async function handlerGetFeeds(cmdname: string, ...args: string[]) {
         printFeed(feedsData[i].users, feedsData[i].feeds)
     }
    
+}
+
+export async function handlerBrowse(cmdname:string, user: User, ...args: string[]) {
+    const rowCount = args[0] ? parseInt(args[0]) : 2; // parses the string into a number or defaults to 2 if undefined
+    const results = await getPostsForUser(user,rowCount)
+    for (const i in results) {
+        console.log(`
+            Feed: ${results[i].feedTitle}
+            title: ${results[i].title}
+            url: ${results[i].url}
+            description: ${results[i].description}
+            pubDate: ${results[i].pubDate}
+            `)
+    }
 }
    
 export async function registerCommand(registry: CommandsRegistry, cmdName: string, handler: CommandHandler) {

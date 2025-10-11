@@ -29,6 +29,13 @@
       "when": 1760097447080,
       "tag": "0003_uneven_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760204654510,
+      "tag": "0004_illegal_goblin_queen",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { feedURLFinder, getNextFeedToFetch, markFeedFetched } from "./db/queries/feeds";
+import { createPost} from "./db/queries/posts";
 import { fetchFeed } from "./rss";
 
 const UNIT_MS: Record<string, number> = {
@@ -25,8 +26,7 @@ export async function scrapeFeeds() {
         } else {
         console.log(`Update found for ${feedData.channel.title}`)
         for (const it of feedItems) {
-        console.log(`[${feedData.channel.title}] ${it.title} — ${it.link}`);
-        console.log(`-----------------------------------------------------`)
+            createPost(it, feedToCheck.id) // needs feed ID as 2nd arg
         }}
 
         } catch (error: any){
