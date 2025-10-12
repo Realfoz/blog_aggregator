@@ -20,6 +20,7 @@ Users can register, follow feeds, and browse recent articles directly from the t
 ### Commands Overview
 
 Below are all available commands and their basic usage.
+All commands start with `npm run start` and are followed by a command and any key arguments as needed. 
 
 #### Command	Description	Example
 | Command | Description | Example |
@@ -28,7 +29,7 @@ Below are all available commands and their basic usage.
 | **register** | Registers a new user | `npm run start register` |
 | **reset** | Clears all data from the database | `npm run start reset` |
 | **users** | Displays all registered users | `npm run start users` |
-| **agg** | Fetches and aggregates RSS feeds based on a timer. Takes a time as a number followed by a h/m/s/ms | `npm run start agg 2h` |
+| **agg** | Fetches and aggregates RSS feeds based on a timer. Takes a time as a number followed by a h/m/s/ms as an argument | `npm run start agg 2h` |
 | **addfeed** | Adds a new RSS feed with a nickname and URL (requires login) | `npm run start addfeed tech https://example.com/rss` |
 | **feeds** | Lists all available feeds with nicknames | `npm run start feeds` |
 | **follow** | Follows a feed by URL (requires login) | `npm run start follow https://example.com/rss` |
@@ -36,7 +37,7 @@ Below are all available commands and their basic usage.
 | **unfollow** | Unfollows a feed (requires login) | `npm run start unfollow https://example.com/rss` |
 | **browse** | Displays the latest X feed entries (defaults to 2) (requires login) | `npm run start browse 5` |
 
-### Tech Stack
+### Built With
 
 - TypeScript
 - Node.js
